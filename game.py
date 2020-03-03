@@ -37,6 +37,23 @@ class GameState(Enum):
 
 # A class that keeps track of all the information having to do with a game
 class Game:
+    COMMAND_PREFIX = "!poker"
+    COMMAND_NEWGAME = "newgame"
+    COMMAND_JOIN = "join"
+    COMMAND_START = "start"
+    COMMAND_QUIT = "quit"
+    COMMAND_DEAL = "deal"
+    COMMAND_CALL = "call"
+    COMMAND_RAISE = "raise"
+    COMMAND_CHECK = "check"
+    COMMAND_FOLD = "fold"
+    COMMAND_HELP = "help"
+    COMMAND_OPTIONS = "options"
+    COMMAND_SET = "set"
+    COMMAND_COUNT = "count"
+    COMMAND_ALL_IN = "all-in"
+    COMMAND_DUNNY_FUN_TIMES = "test"
+
     def __init__(self) -> None:
         self.new_game()
         # Set the game options to the defaults
@@ -49,6 +66,8 @@ class Game:
         self.players: List[Player] = []
         # The players participating in the current hand
         self.in_hand: List[Player] = []
+        #The player who created the room
+        self.admin_index = 0
         # The index of the current dealer
         self.dealer_index = 0
         # The index of the first person to bet in the post-flop rounds
@@ -106,7 +125,7 @@ class Game:
         for player in self.players:
             messages.append(f"{player.user.name} has ${player.balance}.")
         messages.append(f"{self.dealer.user.name} is the current dealer. "
-                        "Message !poker deal to deal when you're ready.")
+                        f"Message {self.COMMAND_PREFIX} {self.COMMAND_DEAL} to deal when you're ready.")
         return messages
 
     # Moves on to the next dealer
@@ -236,11 +255,11 @@ class Game:
         else:
             messages.append(f"The current bet to meet is ${self.cur_bet}.")
         if self.current_player.cur_bet == self.cur_bet:
-            messages.append("Message !poker check, !poker raise or !poker fold.")
+            messages.append(f"Message {self.COMMAND_PREFIX} {self.COMMAND_CHECK}, {self.COMMAND_PREFIX} raise or {self.COMMAND_PREFIX} {self.COMMAND_FOLD}.")
         elif self.current_player.max_bet > self.cur_bet:
-            messages.append("Message !poker call, !poker raise or !poker fold.")
+            messages.append(f"Message {self.COMMAND_PREFIX} {self.COMMAND_CALL}, {self.COMMAND_PREFIX} raise or {self.COMMAND_PREFIX} {self.COMMAND_FOLD}.")
         else:
-            messages.append("Message !poker all-in or !poker fold.")
+            messages.append(f"Message {self.COMMAND_PREFIX} {self.COMMAND_ALL_IN} or {self.COMMAND_PREFIX} {self.COMMAND_FOLD}.")
         return messages
 
     # Advances to the next round of betting (or to the showdown), returning a
