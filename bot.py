@@ -265,7 +265,7 @@ commands: Dict[str, Command] = {
     f'{Game.COMMAND_PREFIX} {Game.COMMAND_NEWGAME}': Command('Starts a new game, allowing players to join.', new_game),
     f'{Game.COMMAND_PREFIX} {Game.COMMAND_JOIN}': Command('Lets you join a game that is about to begin', join_game),
     f'{Game.COMMAND_PREFIX} {Game.COMMAND_START}': Command('Begins a game after all players have joined', start_game),
-    f'{Game.COMMAND_PREFIX} {Game.COMMAND_QUIT}': Command('Begins a game after all players have joined', end_game),
+    f'{Game.COMMAND_PREFIX} {Game.COMMAND_QUIT}': Command('Immediately ends the game', end_game),
     f'{Game.COMMAND_PREFIX} {Game.COMMAND_DEAL}': Command('Deals the hole cards to all the players', deal_hand),
     f'{Game.COMMAND_PREFIX} {Game.COMMAND_CALL}': Command('Matches the current bet', call_bet),
     f'{Game.COMMAND_PREFIX} {Game.COMMAND_RAISE}': Command('Increase the size of current bet', raise_bet),
