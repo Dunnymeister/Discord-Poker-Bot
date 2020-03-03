@@ -5,7 +5,7 @@ from itertools import combinations
 from typing import List, Tuple
 import random
 
-SUITS = ('♠', '♥', '♦', '♣')
+SUITS = ("\\♠", "\\♥", "\\♦", "\\♣")
 
 RankInfo = namedtuple('RankInfo', ['name', 'plural', 'value'])
 
