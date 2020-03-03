@@ -14,7 +14,7 @@ Option = namedtuple("Option", ["description", "default"])
 GAME_OPTIONS: Dict[str, Option] = {
     "blind":  Option("The current price of the small blind", 5),
     "buy-in": Option("The amount of money all players start out with", 500),
-    "raise-delay": Option("The number of minutes before blinds double",  30),
+    "raise-delay": Option("The number of minutes before blinds double", 10),
     "starting-blind": Option("The starting price of the small blind", 5)
 }
 
@@ -106,7 +106,7 @@ class Game:
         for player in self.players:
             messages.append(f"{player.user.name} has ${player.balance}.")
         messages.append(f"{self.dealer.user.name} is the current dealer. "
-                        "Message !deal to deal when you're ready.")
+                        "Message !poker deal to deal when you're ready.")
         return messages
 
     # Moves on to the next dealer
@@ -136,6 +136,10 @@ class Game:
         # Reset the blind to be the starting blind value
         self.options["blind"] = self.options["starting-blind"]
         return ["The game has begun!"] + self.status_between_rounds()
+
+    def quit(self) -> List[str]:
+        self.state = GameState.NO_GAME
+        return [f"The game has been disbanded."]
 
     # Starts a new round of Hold'em, dealing two cards to each player, and
     # return the messages to tell the channel
@@ -232,11 +236,11 @@ class Game:
         else:
             messages.append(f"The current bet to meet is ${self.cur_bet}.")
         if self.current_player.cur_bet == self.cur_bet:
-            messages.append("Message !check, !raise or !fold.")
+            messages.append("Message !poker check, !poker raise or !poker fold.")
         elif self.current_player.max_bet > self.cur_bet:
-            messages.append("Message !call, !raise or !fold.")
+            messages.append("Message !poker call, !poker raise or !poker fold.")
         else:
-            messages.append("Message !all-in or !fold.")
+            messages.append("Message !poker all-in or !poker fold.")
         return messages
 
     # Advances to the next round of betting (or to the showdown), returning a
@@ -376,5 +380,4 @@ class Game:
     # Send a message to each player, telling them what their hole cards are
     async def tell_hands(self, client: discord.Client):
         for player in self.players:
-            await client.send_message(player.user, str(player.cards[0]) + "  "
-                                                   + str(player.cards[1]))
+            await player.user.send(str(player.cards[0]) + "  " + str(player.cards[1]))

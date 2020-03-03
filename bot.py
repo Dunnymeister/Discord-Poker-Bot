@@ -62,6 +62,14 @@ def start_game(game: Game, message: discord.Message) -> List[str]:
     else:
         return game.start()
 
+# Starts a game, so long as one hasn't already started, and there are enough
+# players joined to play. Returns the messages the bot should say.
+def end_game(game: Game, message: discord.Message) -> List[str]:
+    if game.state == GameState.NO_GAME:
+        return ["No game to quit. Message !poker newgame if you would like to start a new game."]
+    else:
+        return game.quit()
+
 # Deals the hands to the players, saying an error message if the hands have
 # already been dealt, or the game hasn't started. Returns the messages the bot
 # should say
@@ -250,6 +258,9 @@ def all_in(game: Game, message: discord.Message) -> List[str]:
     else:
         return game.all_in()
 
+def test(game: Game, message: discord.Message) -> List[str]:
+    return ["Character test: \\♠", "\\♥", "\\♦", "\\♣"]
+
 Command = namedtuple("Command", ["description", "action"])
 
 # The commands avaliable to the players
@@ -260,6 +271,8 @@ commands: Dict[str, Command] = {
                         join_game),
     '!poker start':   Command('Begins a game after all players have joined',
                         start_game),
+    '!poker quit':   Command('Begins a game after all players have joined',
+                        end_game),
     '!poker deal':    Command('Deals the hole cards to all the players',
                         deal_hand),
     '!poker call':    Command('Matches the current bet',
@@ -280,6 +293,8 @@ commands: Dict[str, Command] = {
                         chip_count),
     '!poker all-in':  Command('Bets the entirety of your remaining chips',
                         all_in),
+    '!poker test':  Command('For Dunny\'s pleasure and amusement',
+                        test)
 }
 
 @client.event
@@ -291,14 +306,18 @@ async def on_message(message):
     # Ignore messages sent by the bot itself
     if message.author == client.user:
         return
+    
+    splitMessage = message.content.split()
+
     # Ignore empty messages
-    if len(message.content.split()) = 0:
+    if len(splitMessage) < 2:
         return
+
     # Ignore private messages
     if isinstance(message.channel, discord.abc.PrivateChannel):
         return
 
-    command = message.content.split()[0]
+    command = splitMessage[0] + ' ' + splitMessage[1]
     if command[0] == '!':
         if command not in commands:
             await message.channel.send(f"{message.content} is not a valid command. "
