@@ -146,11 +146,11 @@ def raise_bet(game: Game, message: discord.Message) -> List[str]:
                 f"{game.current_player.name}'s turn."]
 
     tokens = message.content.split()
-    if len(tokens) < 2:
-        return [f"Please follow !raise with the amount that you would "
+    if len(tokens) < 3:
+        return [f"Please follow !poker raise with the amount that you would "
                 "like to raise it by."]
     try:
-        amount = int(tokens[1])
+        amount = int(tokens[2])
         if game.cur_bet >= game.current_player.max_bet:
             return ["You don't have enough money to raise the current bet "
                     f"of ${game.cur_bet}."]
@@ -210,23 +210,20 @@ def show_options(game: Game, message: discord.Message) -> List[str]:
 # Returns the list of messages the bot should say.
 def set_option(game: Game, message: discord.Message) -> List[str]:
     tokens = message.content.split()
-    if len(tokens) == 2:
+    if len(tokens) < 3:
         return ["You must specify a new value after the name of an option "
                 "when using the !poker set command."]
-    elif len(tokens) == 1:
-        return ["You must specify an option and value to set when using "
-                "the !poker set command."]
-    elif tokens[1] not in GAME_OPTIONS:
-        return [f"'{tokens[1]}' is not an option. Message !poker options to see "
+    elif tokens[2] not in GAME_OPTIONS:
+        return [f"'{tokens[2]}' is not an option. Message !poker options to see "
                 "the list of options."]
     try:
-        val = int(tokens[2])
+        val = int(tokens[3])
         if val < 0:
-            return [f"Cannot set {tokens[1]} to a negative value!"]
-        game.options[tokens[1]] = val
-        return [f"The {tokens[1]} is now set to {tokens[2]}."]
+            return [f"Cannot set {tokens[2]} to a negative value!"]
+        game.options[tokens[2]] = val
+        return [f"The {tokens[2]} is now set to {tokens[3]}."]
     except ValueError:
-        return [f"{tokens[1]} must be set to an integer, and '{tokens[2]}'"
+        return [f"{tokens[2]} must be set to an integer, and '{tokens[3]}'"
                 " is not a valid integer."]
 
 # Returns a list of messages that the bot should say to tell the players of
