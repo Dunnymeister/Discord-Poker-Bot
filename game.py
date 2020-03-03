@@ -66,8 +66,6 @@ class Game:
         self.players: List[Player] = []
         # The players participating in the current hand
         self.in_hand: List[Player] = []
-        #The player who created the room
-        self.admin_index = 0
         # The index of the current dealer
         self.dealer_index = 0
         # The index of the first person to bet in the post-flop rounds
@@ -123,8 +121,8 @@ class Game:
     def status_between_rounds(self) -> List[str]:
         messages = []
         for player in self.players:
-            messages.append(f"{player.user.name} has ${player.balance}.")
-        messages.append(f"{self.dealer.user.name} is the current dealer. "
+            messages.append(f"{player.user.display_name} has ${player.balance} :jimmoney:")
+        messages.append(f"{self.dealer.user.mention} is the current dealer :shadesjim:"
                         f"Message {self.COMMAND_PREFIX} {self.COMMAND_DEAL} to deal when you're ready.")
         return messages
 
@@ -228,14 +226,14 @@ class Game:
             self.first_bettor = self.dealer_index - 1
 
         messages.append(f"{small_player.name} has paid the small blind "
-                        f"of ${blind}.")
+                        f"of ${blind} :jimmoney:")
 
         if self.pot.pay_blind(small_player, blind):
             messages.append(f"{small_player.name} is all in!")
             self.leave_hand(small_player)
 
         messages.append(f"{big_player.name} has paid the big blind "
-                        f"of ${blind * 2}.")
+                        f"of ${blind * 2} :jimmoney:")
         if self.pot.pay_blind(big_player, blind * 2):
             messages.append(f"{big_player.name} is all in!")
             self.leave_hand(big_player)
@@ -244,16 +242,16 @@ class Game:
 
     # Returns messages telling the current player their options
     def cur_options(self) -> List[str]:
-        messages = [f"It is {self.current_player.name}'s turn. "
-                    f"{self.current_player.user.name} currently has "
-                    f"${self.current_player.balance}. "
-                    f"The pot is currently ${self.pot.value}."]
+        messages = [f"It is {self.current_player.mention}'s turn. "
+                    f"{self.current_player.user.display_name} currently has "
+                    f"${self.current_player.balance} :jimmoney: "
+                    f"The pot is currently ${self.pot.value} :jimmoney:"]
         if self.pot.cur_bet > 0:
-            messages.append(f"The current bet to meet is ${self.cur_bet}, "
-                            f"and {self.current_player.name} has bet "
+            messages.append(f"The current bet to meet is ${self.cur_bet} :jimmoney:, "
+                            f"and {self.current_player.display_name} has bet "
                             f"${self.current_player.cur_bet}.")
         else:
-            messages.append(f"The current bet to meet is ${self.cur_bet}.")
+            messages.append(f"The current bet to meet is ${self.cur_bet} :jimmoney:")
         if self.current_player.cur_bet == self.cur_bet:
             messages.append(f"Message {self.COMMAND_PREFIX} {self.COMMAND_CHECK}, {self.COMMAND_PREFIX} raise or {self.COMMAND_PREFIX} {self.COMMAND_FOLD}.")
         elif self.current_player.max_bet > self.cur_bet:
@@ -315,7 +313,7 @@ class Game:
         winners = self.pot.get_winners(self.shared_cards)
         for winner, winnings in sorted(winners.items(), key=lambda item: item[1]):
             hand_name = str(best_possible_hand(self.shared_cards, winner.cards))
-            messages.append(f"{winner.name} wins ${winnings} with a {hand_name}.")
+            messages.append(f"{winner.name} wins ${winnings} :jimmoney: with a {hand_name}.")
             winner.balance += winnings
 
         # Remove players that went all in and lost
@@ -350,7 +348,7 @@ class Game:
     # Has the current player raise a certain amount
     def raise_bet(self, amount: int) -> List[str]:
         self.pot.handle_raise(self.current_player, amount)
-        messages = [f"{self.current_player.name} raises by ${amount}."]
+        messages = [f"{self.current_player.name} raises by ${amount} :jimmoney:"]
         if self.current_player.balance == 0:
             messages.append(f"{self.current_player.name} is all in!")
             self.leave_hand(self.current_player)
@@ -382,7 +380,7 @@ class Game:
         # If only one person is left in the pot, give it to them instantly
         if len(self.pot.in_pot()) == 1:
             winner = list(self.pot.in_pot())[0]
-            messages += [f"{winner.name} wins ${self.pot.value}!"]
+            messages += [f"{winner.name} wins ${self.pot.value} :jimmoney:!"]
             winner.balance += self.pot.value
             self.state = GameState.NO_HANDS
             self.next_dealer()
@@ -399,4 +397,5 @@ class Game:
     # Send a message to each player, telling them what their hole cards are
     async def tell_hands(self, client: discord.Client):
         for player in self.players:
+            await player.user.send("You have been dealt the following cards:")
             await player.user.send(str(player.cards[0]) + "  " + str(player.cards[1]))
