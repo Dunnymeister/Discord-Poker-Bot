@@ -227,17 +227,17 @@ class Game:
             self.turn_index = self.dealer_index
             self.first_bettor = self.dealer_index - 1
 
-        messages.append(f"{small_player.name} has paid the small blind "
+        messages.append(f"{small_player.display_name} has paid the small blind "
                         f"of ${blind} <:jimmoney:654622342793658368>")
 
         if self.pot.pay_blind(small_player, blind):
-            messages.append(f"{small_player.name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
+            messages.append(f"{small_player.display_name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
             self.leave_hand(small_player)
 
-        messages.append(f"{big_player.name} has paid the big blind "
+        messages.append(f"{big_player.display_name} has paid the big blind "
                         f"of ${blind * 2} <:jimmoney:654622342793658368>")
         if self.pot.pay_blind(big_player, blind * 2):
-            messages.append(f"{big_player.name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
+            messages.append(f"{big_player.display_name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
             self.leave_hand(big_player)
 
         return messages
@@ -309,13 +309,13 @@ class Game:
         messages.append("  ".join(str(card) for card in self.shared_cards))
 
         for player in self.pot.in_pot():
-            messages.append(f"{player.name}'s hand: "
+            messages.append(f"{player.display_name}'s hand: "
                             f"{player.cards[0]}  {player.cards[1]}")
 
         winners = self.pot.get_winners(self.shared_cards)
         for winner, winnings in sorted(winners.items(), key=lambda item: item[1]):
             hand_name = str(best_possible_hand(self.shared_cards, winner.cards))
-            messages.append(f"{winner.name} wins ${winnings} <:jimmoney:654622342793658368> with a {hand_name}.")
+            messages.append(f"{winner.display_name} wins ${winnings} <:jimmoney:654622342793658368> with a {hand_name}.")
             winner.balance += winnings
 
         # Remove players that went all in and lost
@@ -325,11 +325,11 @@ class Game:
             if player.balance > 0:
                 i += 1
             else:
-                messages.append(f"{player.name} has been knocked out of the game!")
+                messages.append(f"{player.display_name} has been knocked out of the game!")
                 self.players.pop(i)
                 if len(self.players) == 1:
                     # There's only one player, so they win
-                    messages.append(f"{self.players[0].user.name} wins the game! "
+                    messages.append(f"{self.players[0].user.display_name} wins the game! "
                                     "Congratulations!")
                     self.state = GameState.NO_GAME
                     return messages
@@ -345,14 +345,14 @@ class Game:
     # Make the current player check, betting no additional money
     def check(self) -> List[str]:
         self.current_player.placed_bet = True
-        return [f"{self.current_player.name} checks."] + self.next_turn()
+        return [f"{self.current_player.display_name} checks."] + self.next_turn()
 
     # Has the current player raise a certain amount
     def raise_bet(self, amount: int) -> List[str]:
         self.pot.handle_raise(self.current_player, amount)
-        messages = [f"{self.current_player.name} raises by ${amount} <:jimmoney:654622342793658368>"]
+        messages = [f"{self.current_player.display_name} raises by ${amount} <:jimmoney:654622342793658368>"]
         if self.current_player.balance == 0:
-            messages.append(f"{self.current_player.name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
+            messages.append(f"{self.current_player.display_name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
             self.leave_hand(self.current_player)
             self.turn_index -= 1
         return messages + self.next_turn()
@@ -360,9 +360,9 @@ class Game:
     # Has the current player match the current bet
     def call(self) -> List[str]:
         self.pot.handle_call(self.current_player)
-        messages = [f"{self.current_player.name} calls."]
+        messages = [f"{self.current_player.display_name} calls."]
         if self.current_player.balance == 0:
-            messages.append(f"{self.current_player.name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
+            messages.append(f"{self.current_player.display_name} is all in! <:Ripmoney:654631444437532682><:Ripmoney:654631444437532682><:Ripmoney:654631444437532682>")
             self.leave_hand(self.current_player)
             self.turn_index -= 1
         return messages + self.next_turn()
@@ -375,14 +375,14 @@ class Game:
 
     # Has the current player fold their hand
     def fold(self) -> List[str]:
-        messages = [f"{self.current_player.name} has folded."]
+        messages = [f"{self.current_player.display_name} has folded."]
         self.pot.handle_fold(self.current_player)
         self.leave_hand(self.current_player)
 
         # If only one person is left in the pot, give it to them instantly
         if len(self.pot.in_pot()) == 1:
             winner = list(self.pot.in_pot())[0]
-            messages += [f"{winner.name} wins ${self.pot.value} <:jimmoney:654622342793658368>!"]
+            messages += [f"{winner.display_name} wins ${self.pot.value} <:jimmoney:654622342793658368>!"]
             winner.balance += self.pot.value
             self.state = GameState.NO_HANDS
             self.next_dealer()
@@ -399,5 +399,4 @@ class Game:
     # Send a message to each player, telling them what their hole cards are
     async def tell_hands(self, client: discord.Client):
         for player in self.players:
-            await player.user.send("You have been dealt the following cards:")
-            await player.user.send(str(player.cards[0]) + "  " + str(player.cards[1]))
+            await player.user.send("You have been dealt the following cards:\n" + str(player.cards[0]) + "  " + str(player.cards[1]))

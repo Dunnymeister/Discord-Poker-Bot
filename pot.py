@@ -86,7 +86,7 @@ class PotManager:
             print(f"Pot #{i}. Bet: ${pot.cur_bet} (Max: {pot.max_bet}). "
                   f"Amount: ${pot.amount}.")
             for player in pot.players:
-                print(f"{player.name}: {player.balance}")
+                print(f"{player.display_name}: {player.balance}")
             print("-----")
 
     # Handles a player folding, removing them from every pot that they're

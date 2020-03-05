@@ -240,19 +240,16 @@ def all_in(game: Game, message: discord.Message) -> List[str]:
     elif game.state == GameState.WAITING:
         return ["You can't go all in because the game hasn't started yet."]
     elif not game.is_player(message.author):
-        return ["You can't go all in, because you're not playing, "
-                f"{message.author.display_name}."]
+        return [f"You can't go all in, because you're not playing, {message.author.display_name}."]
     elif game.state == GameState.NO_HANDS:
-        return ["You can't go all in because the hands haven't "
-                "been dealt yet."]
+        return ["You can't go all in because the hands haven't been dealt yet."]
     elif game.current_player.user != message.author:
-        return [f"You can't go all in, {message.author.display_name}, because "
-                f"it's {game.current_player.user.display_name}'s turn."]
+        return [f"You can't go all in, {message.author.display_name}, because it's {game.current_player.user.display_name}'s turn."]
     else:
         return game.all_in()
 
 def test(game: Game, message: discord.Message) -> List[str]:
-    return ["Character test: \\♠", "\\♥", "\\♦", "\\♣"]
+    return ["Character test: ", "♠", "♥", "♦", "♣"]
 
 Command = namedtuple("Command", ["description", "action"])
 
