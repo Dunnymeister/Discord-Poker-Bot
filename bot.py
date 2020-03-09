@@ -249,7 +249,7 @@ def all_in(game: Game, message: discord.Message) -> List[str]:
         return game.all_in()
 
 def test(game: Game, message: discord.Message) -> List[str]:
-    return ["Character test: ", "♠", "♥", "♦", "♣"]
+    return ["Character test: <:matt_damon:686433007099445278> <:card_spade:686443100155150386> <:card_heart:686443099861418016> <:card_diamond:686443100041642014> <:card_club:686443100020801542>"]
 
 Command = namedtuple("Command", ["description", "action"])
 
@@ -295,8 +295,8 @@ async def on_message(message):
     command = splitMessage[0] + ' ' + splitMessage[1]
     if command[0] == '!':
         if command not in commands:
-            await message.channel.send(f"{message.content} is not a valid command. "
-                                 f"Message **{Game.COMMAND_PREFIX} {Game.COMMAND_HELP}** to see the list of commands.")
+            #await message.channel.send(f"{message.content} is not a valid command. "
+            #                     f"Message **{Game.COMMAND_PREFIX} {Game.COMMAND_HELP}** to see the list of commands.")
             return
 
         game = games.setdefault(message.channel, Game())

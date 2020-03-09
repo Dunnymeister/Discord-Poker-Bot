@@ -5,7 +5,7 @@ from itertools import combinations
 from typing import List, Tuple
 import random
 
-SUITS = ("\\♠", "\\♥", "\\♦", "\\♣")
+SUITS = ("<:card_spade:686443100155150386>", "<:card_heart:686443099861418016>", "<:card_diamond:686443100041642014>", "<:card_club:686443100020801542>")
 
 RankInfo = namedtuple('RankInfo', ['name', 'plural', 'value'])
 
